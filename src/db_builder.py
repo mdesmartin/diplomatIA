@@ -1,3 +1,4 @@
+import os
 import logging
 from tqdm import tqdm
 from typing import List
@@ -9,7 +10,6 @@ from llama_index.core.text_splitter import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core import Settings
 import faiss
-import os
 import pickle
 from dotenv import load_dotenv
 
@@ -44,6 +44,10 @@ class TextCleaner(TransformComponent):
 
 # Function to build or update the database
 def build_database(data_dir: str, faiss_index_path: str, nodes_path: str):
+    # Ensure the output directory exists
+    output_dir = os.path.dirname(faiss_index_path)
+    os.makedirs(output_dir, exist_ok=True)
+
     # Load documents from the specified directory
     logging.info(f"Loading documents from {data_dir}...")
     node_parser = SimpleDirectoryReader(input_dir=data_dir, required_exts=['.pdf'])
@@ -92,9 +96,9 @@ def build_database(data_dir: str, faiss_index_path: str, nodes_path: str):
     return VectorStoreIndex(nodes)
 
 if __name__ == "__main__":
-    data_dir = "data/"
-    faiss_index_path = "faiss_index.index"
-    nodes_path = "nodes.pkl"
+    data_dir = "../data/"
+    faiss_index_path = "../db/faiss_index.index"
+    nodes_path = "../db/nodes.pkl"
     
     # Build or update the database
     build_database(data_dir, faiss_index_path, nodes_path)
