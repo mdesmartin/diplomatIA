@@ -1,3 +1,5 @@
+#db_builder.py
+
 import os
 import logging
 from tqdm import tqdm
@@ -15,8 +17,8 @@ from dotenv import load_dotenv
 
 # Constants
 EMBED_DIMENSION = 512
-CHUNK_SIZE = 200
-CHUNK_OVERLAP = 50
+CHUNK_SIZE = 600
+CHUNK_OVERLAP = 200
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -96,9 +98,9 @@ def build_database(data_dir: str, faiss_index_path: str, nodes_path: str):
     return VectorStoreIndex(nodes)
 
 if __name__ == "__main__":
-    data_dir = "../data/"
-    faiss_index_path = "../db/faiss_index.index"
-    nodes_path = "../db/nodes.pkl"
+    data_dir = "/app/data/"
+    faiss_index_path = "/app/db/faiss_index.index"
+    nodes_path = "/app/db/nodes.pkl"
     
     # Build or update the database
     build_database(data_dir, faiss_index_path, nodes_path)

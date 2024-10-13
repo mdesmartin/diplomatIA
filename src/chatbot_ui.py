@@ -1,5 +1,16 @@
+import os
+from dotenv import load_dotenv
 import streamlit as st
 from rag_query_interface import load_query_engine
+
+load_dotenv()
+
+# Vérifiez que la clé API est chargée
+api_key = os.getenv("OPENAI_API_KEY")
+if api_key is None:
+    raise ValueError("OPENAI_API_KEY is not set. Please check your .env file.")
+else:
+    print("API Key successfully loaded.")
 
 # Set up page configuration and title
 st.set_page_config(page_title="Diplomatic RAG Chatbot", page_icon="🌎", layout="centered", initial_sidebar_state="auto")
@@ -7,8 +18,8 @@ st.title("Diplomatic RAG Chatbot 💬🌎")
 st.info("Posez n’importe quelle question liée aux enjeux géopolitiques et obtenez des réponses pertinentes basées sur des articles du Monde diplomatique.", icon="📄")
 
 # Define paths for FAISS index and nodes
-faiss_index_path = "../db/faiss_index.index"  # Chemin mis à jour vers l'index FAISS
-nodes_path = "../db/nodes.pkl"  # Chemin mis à jour vers les nœuds
+faiss_index_path = "/app/db/faiss_index.index"  # Chemin mis à jour vers l'index FAISS
+nodes_path = "/app/db/nodes.pkl"  # Chemin mis à jour vers les nœuds
 
 # Load the query engine
 query_engine = load_query_engine(faiss_index_path, nodes_path)

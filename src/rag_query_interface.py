@@ -1,3 +1,5 @@
+#rag_query_interface.py
+
 import pickle
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.core import VectorStoreIndex
@@ -19,8 +21,8 @@ def load_query_engine(faiss_index_path: str, nodes_path: str):
     return index.as_query_engine(similarity_top_k=5)
 
 if __name__ == "__main__":
-    faiss_index_path = "../db/faiss_index.index"  # Chemin mis à jour vers l'index FAISS
-    nodes_path = "../db/nodes.pkl"  # Chemin mis à jour vers les nœuds
+    faiss_index_path = "/app/db/faiss_index.index"  # Chemin mis à jour vers l'index FAISS
+    nodes_path = "/app/db/nodes.pkl"  # Chemin mis à jour vers les nœuds
 
     # Load the query engine
     query_engine = load_query_engine(faiss_index_path, nodes_path)
