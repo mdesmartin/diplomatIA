@@ -1,3 +1,5 @@
+# chatbot_ui.py
+
 import os
 from dotenv import load_dotenv
 import streamlit as st
@@ -12,51 +14,50 @@ if api_key is None:
 else:
     print("API Key successfully loaded.")
 
-# Set up page configuration and title
+# Configuration de la page et du titre
 st.set_page_config(page_title="Diplomatic RAG Chatbot", page_icon="🌎", layout="centered", initial_sidebar_state="auto")
 st.title("Diplomatic RAG Chatbot 💬🌎")
 st.info("Posez n’importe quelle question liée aux enjeux géopolitiques et obtenez des réponses pertinentes basées sur des articles du Monde diplomatique.", icon="📄")
 
-# Define paths for FAISS index and nodes
-faiss_index_path = "/app/db/faiss_index.index"  # Chemin mis à jour vers l'index FAISS
-nodes_path = "/app/db/nodes.pkl"  # Chemin mis à jour vers les nœuds
+# Chemin vers le dossier contenant l'index
+index_save_path = "db"  # Assurez-vous que ce chemin est correct
 
-# Load the query engine
-query_engine = load_query_engine(faiss_index_path, nodes_path)
+# Charger le query engine
+query_engine = load_query_engine(index_save_path)
 
-# Initialize chat history
+# Initialisation de l'historique de chat
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Comment puis-je vous aider aujourd’hui ? Posez n’importe quelle question."}]
 
-# User input area for questions
+# Zone de saisie pour les questions de l'utilisateur
 if prompt := st.chat_input("Posez votre question"):
-    # Append user message to chat history
+    # Ajouter le message de l'utilisateur à l'historique
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-# Display chat history
+# Affichage de l'historique de chat
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Process the user's question and display the answer
+# Traitement de la question de l'utilisateur et affichage de la réponse
 if st.session_state.messages[-1]["role"] == "user":
     with st.chat_message("assistant"):
-        # Query the engine and get the answer
+        # Interroger le query engine et obtenir la réponse
         response = query_engine.query(st.session_state.messages[-1]["content"])
         generated_answer = response.response
-        context = [doc.text for doc in response.source_nodes]
+        context = [node.node.text for node in response.source_nodes]
 
-        # Display the generated answer
+        # Afficher la réponse générée
         st.write(generated_answer)
 
-        # Display retrieved documents
-        st.subheader("Sources: (Retrieved Documents)")
+        # Afficher les documents récupérés
+        st.subheader("Sources : (Documents récupérés)")
         for idx, doc in enumerate(context):
             st.write(f"Document {idx + 1}: {doc}")
 
-        # Append the assistant's response to chat history
+        # Ajouter la réponse de l'assistant à l'historique de chat
         st.session_state.messages.append({"role": "assistant", "content": generated_answer})
 
-# Exit button
+# Bouton de sortie
 if st.button("Quitter"):
     st.write("Session terminée. Actualisez la page pour recommencer.")
