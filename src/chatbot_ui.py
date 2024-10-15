@@ -15,8 +15,8 @@ else:
     print("API Key successfully loaded.")
 
 # Configuration de la page et du titre
-st.set_page_config(page_title="Diplomatic RAG Chatbot", page_icon="🌎", layout="centered", initial_sidebar_state="auto")
-st.title("Diplomatic RAG Chatbot 💬🌎")
+st.set_page_config(page_title="diplomatIA", page_icon="🌎", layout="centered", initial_sidebar_state="auto")
+st.title("diplomatIA 🌎")
 st.info("Posez n’importe quelle question liée aux enjeux géopolitiques et obtenez des réponses pertinentes basées sur des articles du Monde diplomatique.", icon="📄")
 
 # Chemin vers le dossier contenant l'index
@@ -45,15 +45,37 @@ if st.session_state.messages[-1]["role"] == "user":
         # Interroger le query engine et obtenir la réponse
         response = query_engine.query(st.session_state.messages[-1]["content"])
         generated_answer = response.response
-        context = [node.node.text for node in response.source_nodes]
 
         # Afficher la réponse générée
         st.write(generated_answer)
 
-        # Afficher les documents récupérés
-        st.subheader("Sources : (Documents récupérés)")
-        for idx, doc in enumerate(context):
-            st.write(f"Document {idx + 1}: {doc}")
+        # Collecter les métadonnées des sources
+        sources = {}
+        for node_with_score in response.source_nodes:
+            node = node_with_score.node
+            metadata = node.metadata
+            title = metadata.get('title', 'Titre inconnu')
+            if title not in sources:
+                sources[title] = {
+                    'author': metadata.get('author', 'Auteur inconnu'),
+                    'date': metadata.get('date', 'Date inconnue'),
+                    'bio': metadata.get('bio', ''),
+                }
+
+        # Afficher les sources dans le format spécifié sans interlignes
+        st.subheader("Sources")
+        for title, meta in sources.items():
+            # Créer une chaîne HTML combinant le titre, la date, l'auteur et la bio
+            source_line = f"""
+            <p style="margin:0">
+                <strong>{title}</strong>, {meta['date']}<br>
+                {meta['author']}
+            """
+            if meta['bio']:
+                source_line += f" - <em>{meta['bio']}</em>"
+            source_line += "</p>"
+            # Afficher la chaîne formatée
+            st.markdown(source_line, unsafe_allow_html=True)
 
         # Ajouter la réponse de l'assistant à l'historique de chat
         st.session_state.messages.append({"role": "assistant", "content": generated_answer})
