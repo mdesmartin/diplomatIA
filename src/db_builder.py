@@ -1,12 +1,12 @@
-#db_builder.py
+# db_builder.py
 
 import os
 import logging
 from tqdm import tqdm
 from typing import List
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core import VectorStoreIndex
 from llama_index.core.ingestion import IngestionPipeline
-from llama_index.core.schema import BaseNode, TransformComponent
+from llama_index.core.schema import TextNode, TransformComponent
 from llama_index.vector_stores.faiss import FaissVectorStore
 from llama_index.core.text_splitter import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
@@ -14,6 +14,8 @@ from llama_index.core import Settings
 import faiss
 import pickle
 from dotenv import load_dotenv
+import pdfplumber
+import re
 
 # Constants
 EMBED_DIMENSION = 512
@@ -32,16 +34,29 @@ Settings.embed_model = OpenAIEmbedding(model="text-embedding-ada-002")
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-# Define the text cleaner class
+# Function to extract text from a PDF using pdfplumber
+def extract_text_from_pdf(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        full_text = ""
+        for page in pdf.pages:
+            text = page.extract_text()
+            full_text += text if text else ""
+    return full_text
+
+# Custom class to clean and normalize text
 class TextCleaner(TransformComponent):
     """
     Transformation to be used within the ingestion pipeline.
-    Cleans clutters from texts.
+    Cleans clutters from texts and ensures proper spacing.
     """
-    def __call__(self, nodes, **kwargs) -> List[BaseNode]:
+    def __call__(self, nodes, **kwargs) -> List[TextNode]:
         for node in nodes:
-            node.text = node.text.replace('\t', ' ')  # Replace tabs with spaces
-            node.text = node.text.replace(' \n', ' ')  # Replace paragraph separator with spaces
+            print("Texte avant nettoyage:", node.text[:500])  # Avant nettoyage
+            # Replace multiple spaces with a single space
+            node.text = re.sub(r'\s+', ' ', node.text)
+            # Add space between words that were joined (e.g., between a lowercase and an uppercase)
+            node.text = re.sub(r'(\w)([A-Z])', r'\1 \2', node.text)
+            print("Texte après nettoyage:", node.text[:500])  # Après nettoyage
         return nodes
 
 # Function to build or update the database
@@ -50,10 +65,16 @@ def build_database(data_dir: str, faiss_index_path: str, nodes_path: str):
     output_dir = os.path.dirname(faiss_index_path)
     os.makedirs(output_dir, exist_ok=True)
 
-    # Load documents from the specified directory
+    # Load PDF files and extract text
     logging.info(f"Loading documents from {data_dir}...")
-    node_parser = SimpleDirectoryReader(input_dir=data_dir, required_exts=['.pdf'])
-    documents = node_parser.load_data()
+    documents = []
+    for filename in os.listdir(data_dir):
+        if filename.endswith(".pdf"):
+            file_path = os.path.join(data_dir, filename)
+            logging.info(f"Extracting text from {file_path}...")
+            extracted_text = extract_text_from_pdf(file_path)
+            documents.append(TextNode(text=extracted_text))
+            print("Texte extrait du PDF:", extracted_text[:1000])  # Afficher les 1000 premiers caractères
 
     logging.info(f"Loaded {len(documents)} documents.")
 
@@ -80,6 +101,7 @@ def build_database(data_dir: str, faiss_index_path: str, nodes_path: str):
     for document in tqdm(documents, desc="Processing Documents", unit="doc"):
         document_nodes = pipeline.run(documents=[document])
         nodes.extend(document_nodes)
+        print("Texte à indexer dans FAISS:", document_nodes[0].text[:500])  # Afficher les premiers chunks traités
 
     logging.info("Finished processing documents.")
 
