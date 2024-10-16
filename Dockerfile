@@ -9,14 +9,17 @@ WORKDIR /app
 # Copy requirements file
 COPY requirements.txt .
 
-# Copy .env file
-COPY .env .env
-
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project
-COPY . .
+# Copy the source code
+COPY src/ src/
+
+# Copy the .env file if needed
+COPY .env .env
+
+# Expose the necessary port
+EXPOSE 8501
 
 # Command to run when the container starts
 CMD ["streamlit", "run", "src/chatbot_ui.py"]
