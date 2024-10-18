@@ -4,210 +4,210 @@
 ![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
 ![Docker](https://img.shields.io/badge/docker-20.10%2B-blue.svg)
 
-## Table des Matières
+## Table of Contents
 
-- [Présentation](#présentation)
-- [Fonctionnalités](#fonctionnalités)
+- [Overview](#overview)
+- [Features](#features)
 - [Architecture](#architecture)
 - [Installation](#installation)
-  - [Prérequis](#prérequis)
-  - [Utilisation du Makefile](#utilisation-du-makefile)
-- [Utilisation](#utilisation)
-- [Structure du Projet](#structure-du-projet)
-- [Technologies](#technologies)
+  - [Prerequisites](#prerequisites)
+  - [Using the Makefile](#using-the-makefile)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Technologies](#Technologies)
 - [Contribution](#contribution)
-- [Licence](#licence)
+- [License](#lisence)
 - [Contact](#contact)
 
-## Présentation
+## Overview
 
-**diplomatIA** est un projet personnel visant à développer un agent diplomatique intelligent utilisant la Génération Augmentée par Récupération (RAG). Cet agent exploite une base de données vectorielle d'articles d'un journal specialisé en géopolitique pour fournir des réponses informées aux questions des utilisateurs, accompagnées de citations de sources.
+**diplomatIA** is a personal project aimed at developing an intelligent diplomatic agent using Retrieval-Augmented Generation (RAG). This agent leverages a vector database of articles from a specialized geopolitical journal to provide informed responses to user questions, accompanied by source citations.
 
-## Fonctionnalités
+## Features
 
-- **Génération Augmentée par Récupération (RAG) :** Combine l'IA générative avec un système de récupération pour des réponses précises et contextuellement pertinentes.
-- **Base de Données Vectorielle avec FAISS :** Indexe efficacement un large corpus d'articles diplomatiques pour une recherche rapide.
-- **Pipeline de Données Automatisé :** Extraction, normalisation et indexation des articles EPUB pour des mises à jour fluides.
-- **Interface Interactive avec Streamlit :** Interface conviviale permettant une interaction intuitive avec l'agent diplomatique.
-- **Déploiement Dockerisé :** Assure la portabilité et la facilité de déploiement sur différents environnements.
-- **Automatisation via Makefile :** Simplifie les tâches de construction, d'exécution et de maintenance grâce à des cibles prédéfinies.
+- **Retrieval-Augmented Generation (RAG):** Combines generative AI with a retrieval system for accurate and contextually relevant responses.
+- **Vector Database with FAISS:** Efficiently indexes a large corpus of diplomatic articles for quick searching.
+- **Automated Data Pipeline:** Extraction, normalization, and indexing of EPUB articles for seamless updates.
+- **Interactive Interface with Streamlit:** User-friendly interface allowing intuitive interaction with the diplomatic agent.
+- **Dockerized Deployment:** Ensures portability and ease of deployment across different environments.
+- **Automation via Makefile:** Simplifies build, execution, and maintenance tasks with predefined targets.
 
 ## Architecture
 
-diplomatIA/
-├── Dockerfile
-├── Makefile
-├── README.md
-├── data
-│   ├── extracted_epubs
-│   └── raw
-│       ├── Le-Journal-Geopolitique-2019-01.epub
-│       ├── …
-│       └── Le-Journal-Geopolitique-2024-10.epub
-├── requirements.txt
-└── src
-├── build_vector_store.py
-├── chatbot_ui.py
-├── extract_articles.py
-└── rag_query_interface.py
+	diplomatIA/
+	├── Dockerfile
+	├── Makefile
+	├── README.md
+	├── data
+	│   ├── extracted_epubs
+	│   └── raw
+	│       ├── Le-Journal-Geopolitique-2019-01.epub
+	│       ├── …
+	│       └── Le-Journal-Geopolitique-2024-10.epub
+	├── requirements.txt
+	└── src
+		├── build_vector_store.py
+		├── chatbot_ui.py
+		├── extract_articles.py
+		└── rag_query_interface.py
 
 ## Installation
 
-### Prérequis
+### Prerequisites
 
-- [Docker](https://www.docker.com/get-started) installé sur votre machine.
-- [Make](https://www.gnu.org/software/make/) installé.
-- [Git](https://git-scm.com/) installé.
+- [Docker](https://www.docker.com/get-started) installed on your machine.
+- [Make](https://www.gnu.org/software/make/) installed.
+- [Git](https://git-scm.com/) installed.
 
-### Utilisation du Makefile
+### Using the Makefile
 
-Le projet inclut un `Makefile` pour automatiser les tâches courantes telles que la construction de l'image Docker, l'exécution du conteneur, la reconstruction de la base de données vectorielle et le nettoyage des ressources.
+The project includes a `Makefile` to automate common tasks such as building the Docker image, running the container, rebuilding the vector database, and cleaning up resources.
 
-#### Cibles du Makefile
+### Makefile Targets
 
-- `all` : Construit et exécute le conteneur Docker.
-- `build` : Construit l'image Docker.
-- `run` : Exécute le conteneur Docker, initialisant la base de données vectorielle si elle n'existe pas.
-- `rebuild` : Reconstruit la base de données vectorielle et redémarre l'application.
-- `clean` : Supprime l'image Docker.
-- `fclean` : Supprime l'image Docker, le conteneur et le volume Docker associé.
+- `all` : Builds and runs the Docker container.
+- `build` : Builds the Docker image.
+- `run` : Runs the Docker container, initializing the vector database if it does not exist.
+- `rebuild` : Rebuilds the vector database and restarts the application.
+- `clean` : Removes the Docker image.
+- `fclean` : Removes the Docker image, container, and associated Docker volume.
 
-#### Étapes d'installation
+#### Installation Steps
 
-1. **Cloner le Dépôt**
+1.	**Clone the Repository**
 
-   ```bash
-   git clone https://github.com/mdesmartin/diplomatIA.git
-   cd diplomatIA
+	```bash
+	git clone https://github.com/mdesmartin/diplomatIA.git
+	cd diplomatIA
 
-2. **Configurer les Variables d’Environnement**
+2.	**Configure Environment Variables**
 
-	Créez un fichier .env à la racine du projet et ajoutez votre clé API OpenAI :
+	Create a .env file at the root of the project and add your OpenAI API key:
 
 		OPENAI_API_KEY=your_openai_api_key
 
-3. **Placer les Fichiers EPUB**
+3.	**Place the EPUB Files**
 
-	Assurez-vous que tous les fichiers EPUB du journal géopolitique sont placés dans le répertoire data/raw.
+	Ensure that all EPUB files from the geopolitical journal are placed in the data/raw directory.
 
-4.	**Construire et Exécuter avec le Makefile**
+4.	**Build and Run with the Makefile**
 
-	•	Construire l’Image Docker
-		
+	•	Build the Docker Image
+
 		make build
 
 
-	•	Exécuter le Conteneur Docker
+	•	Run the Docker Container
 
 		make run
 
-	Cette commande effectuera les actions suivantes :
+	This command will perform the following actions:
+		•	Mount the data directory and a Docker volume for the database.
+		
+	•	Build the FAISS database if it does not exist.
 
-	•	Monter le répertoire data et un volume Docker pour la base de données.
+	•	Launch the Streamlit application accessible at http://localhost:8501.
 
-	•	Construire la base de données FAISS si elle n’existe pas.
-
-	•	Lancer l’application Streamlit accessible à l’adresse http://localhost:8501.
-
-	•	Reconstruire la Base de Données Vectorielle
+	•	Rebuild the Vector Database
 
 		make rebuild
 
-	Cette commande force la reconstruction de l’index FAISS et redémarre l’application Streamlit.
+	This command forces the reconstruction of the FAISS index and restarts the Streamlit application.
 
-	•	Nettoyer les Ressources Docker
+	•	Clean Docker Resources
 
 		make clean
 
-	Supprime l’image Docker.
+	Removes the Docker image.
 
 		make fclean
 
-	Supprime l’image Docker, le conteneur et le volume Docker associé.
+	Removes the Docker image, container, and associated Docker volume.
 
-## Utilisation
+## Usage
 
-1.	**Accéder à l’Application**
+1.	**Access the Application**
+	Open your web browser and navigate to http://localhost:8501.
 
-	Ouvrez votre navigateur web et naviguez vers http://localhost:8501.
+2.	**Interact with the Diplomatic Agent**
+	
+	•	Enter your questions related to geopolitical issues.
+	
+	•	Receive detailed responses based on articles from the geopolitical journal.
+	
+	•	View cited sources for each response.
 
-2.	**Interagir avec l’Agent Diplomatique**
+3.	**Exit the Application**
 
-	•	Entrez vos questions liées aux enjeux géopolitiques.
+	Click the “Quit” button in the Streamlit interface to end the session.
 
-	•	Recevez des réponses détaillées basées sur les articles du journal géopolitique.
+## Project Structure
 
-	•	Consultez les sources citées pour chaque réponse.
+•	**Dockerfile :** Defines the Docker image for the application.
 
-3.	**Quitter l’Application**
-Cliquez sur le bouton “Quitter” dans l’interface Streamlit pour terminer la session.
+•	**Makefile :** Contains build and execution commands to simplify usage.
 
-## Structure du Projet
+•	**data/raw :** Contains raw EPUB files from the geopolitical journal.
 
-•	**Dockerfile** : Définit l’image Docker pour l’application.
+•	**data/extracted_epubs :** Stores the extracted and processed content from EPUBs.
 
-•	**Makefile** : Contient les commandes de construction et d’exécution pour simplifier l’utilisation.
+•	**src/build_vector_store.py :** Builds the FAISS vector database from extracted articles.
 
-•	**data/raw** : Contient les fichiers EPUB bruts du journal géopolitique.
+•	**src/extract_articles.py :** Extracts and preprocesses articles from EPUB files.
 
-•	**data/extracted_epubs** : Stocke le contenu extrait et traité des EPUB.
+•	**src/rag_query_interface.py :** Manages the RAG query engine.
 
-•	**src/build_vector_store.py** : Construit la base de données vectorielle FAISS à partir des articles extraits.
+•	**src/chatbot_ui.py :** Implements the Streamlit-based user interface.
 
-•	**src/extract_articles.py** : Extrait et prétraite les articles des fichiers EPUB.
-
-•	**src/rag_query_interface.py** : Gère le moteur de requêtes RAG.
-
-•	**src/chatbot_ui.py** : Implémente l’interface utilisateur basée sur Streamlit.
-
-•	**requirements.txt** : Liste les dépendances Python nécessaires.
+•	**requirements.txt :** Lists the necessary Python dependencies.
 
 ## Technologies
 
-•	**Python 3.11** : Langage de programmation principal.
+•	**Python 3.11 :** Main programming language.
 
-•	**FAISS** : Base de données vectorielle pour des recherches de similarité efficaces.
+•	**FAISS :** Vector database for efficient similarity searches.
 
-•	**LlamaIndex** : Gestion des embeddings et des interfaces de requêtes.
+•	**LlamaIndex :** Manages embeddings and query interfaces.
 
-•	**Streamlit** : Création de l’interface web interactive.
+•	**Streamlit :** Creates the interactive web interface.
 
-•	**Docker** : Conteneurisation de l’application pour une portabilité accrue.
+•	**Docker :** Containerizes the application for enhanced portability.
 
-•	**BeautifulSoup** : Parsing et extraction des données des fichiers EPUB.
+•	**BeautifulSoup :** Parses and extracts data from EPUB files.
 
-•	**OpenAI API** : Alimente les capacités d’IA générative.
+•	**OpenAI API :** Powers the generative AI capabilities.
 
 ## Contribution
 
-Les contributions sont les bienvenues ! Veuillez suivre les étapes suivantes :
+Contributions are welcome! Please follow these steps:
 
-1.	Forker le Dépôt
+1.	Fork the Repository
 
-2.	Créer une Branche de Fonctionnalité
+2.	Create a Feature Branch
 
-		git checkout -b feature/votreFeature
+		git checkout -b feature/yourFeature
 
-3.	Committer vos Changements
 
-		git commit -m "Ajout de votre fonctionnalité"
+3.	Commit Your Changes
 
-4.	Pousser la Branche
+		git commit -m "Add your feature"
 
-		git push origin feature/votreFeature
+4.	Push the Branch
 
-5.	Ouvrir une Pull Request
+		git push origin feature/yourFeature
 
-	Assurez-vous que votre code respecte les standards du projet et inclut des tests appropriés.
+5.	Open a Pull Request
+	
+	Ensure that your code adheres to project standards and includes appropriate tests.
 
-## Licence
+## License
 
-Ce projet est sous licence MIT.
+This project is licensed under the MIT License.
 
 ## Contact
 
-**Auteur** : Mehdi DESMARTIN
+**Author:** Mehdi DESMARTIN
 
-**LinkedIn** : linkedin.com/in/mdesmartin
+**LinkedIn:** linkedin.com/in/mdesmartin
 
-**GitHub** : github.com/mdesmartin
+**GitHub:** github.com/mdesmartin
